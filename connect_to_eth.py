@@ -33,12 +33,13 @@ def connect_with_middleware(contract_json):
 
 
 if __name__ == "__main__":
-	connect_to_eth()
-    # w3, c = connect_with_middleware("contract_info.json")
-    # print("connected:", w3.is_connected())
-    # print("chainId:", w3.eth.chain_id)
+	# connect_to_eth()
+    w3, c = connect_with_middleware("contract_info.json")
+    print("connected:", w3.is_connected())
+    print("chainId:", w3.eth.chain_id)
 
-    # print("contract version:", c.functions.version().call())
+    print("contract version:", c.functions.version().call())
+
 
 
 
