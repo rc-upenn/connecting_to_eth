@@ -30,8 +30,10 @@ def connect_with_middleware(contract_json):
 
     w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
 
-    checksum_address = w3.to_checksum_address(address)
-    contract = w3.eth.contract(address=checksum_address, abi=abi)
+    contract = w3.eth.contract(
+        address=w3.to_checksum_address(address),
+        abi=abi
+    )
 
     return w3, contract
 
@@ -42,4 +44,5 @@ if __name__ == "__main__":
     print("chainId:", w3.eth.chain_id)
 
     print("contract version:", c.functions.version().call())
+
 
