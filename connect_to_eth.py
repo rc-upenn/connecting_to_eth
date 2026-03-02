@@ -18,24 +18,37 @@ def connect_to_eth():
 
 
 def connect_with_middleware(contract_json):
-    with open(contract_json, "r") as f:
-        d = json.load(f)
-        d = d["bsc"]
-        address = d["address"]
-        abi = d["abi"]
+    bsc_urls = [
+        "https://bsc.publicnode.com",
+        "https://rpc.ankr.com/bsc",
+        "https://bsc-dataseed.binance.org/",
+    ]
 
-    bsc_url = "https://bsc.publicnode.com"
-    w3 = Web3(HTTPProvider(bsc_url))
-    assert w3.is_connected(), f"Failed to connect to provider at {bsc_url}"
+    last_err = None
+    for bsc_url in bsc_urls:
+        try:
+            w3 = Web3(HTTPProvider(bsc_url))
+            if not w3.is_connected():
+                continue
 
-    w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+            # Inject PoA middleware BEFORE any chain reads
+            w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
 
-    contract = w3.eth.contract(
-        address=w3.to_checksum_address(address),
-        abi=abi
-    )
+            contract = w3.eth.contract(
+                address=w3.to_checksum_address(address),
+                abi=abi
+            )
 
-    return w3, contract
+            # Verify the contract call works (prevents returning a broken setup)
+            _ = contract.functions.version().call()
+
+            return w3, contract
+
+        except Exception as e:
+            last_err = e
+            continue
+
+    raise RuntimeError(f"Failed to connect/call contract on BSC via all RPCs. Last error: {last_err}")
 
 
 if __name__ == "__main__":
@@ -45,6 +58,7 @@ if __name__ == "__main__":
     # print("chainId:", w3.eth.chain_id)
 
     # print("contract version:", c.functions.version().call())
+
 
 
 
