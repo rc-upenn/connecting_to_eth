@@ -11,7 +11,7 @@ infura_url = f"https://mainnet.infura.io/v3/{infura_token}"
 '''
 
 def connect_to_eth():
-	url = "https://cloudflare-eth.com"
+	url = "https://ethereum.publicnode.com"
 	w3 = Web3(HTTPProvider(url))
 	assert w3.is_connected(), f"Failed to connect to provider at {url}"
 	return w3
@@ -44,5 +44,6 @@ if __name__ == "__main__":
     print("chainId:", w3.eth.chain_id)
 
     print("contract version:", c.functions.version().call())
+
 
 
